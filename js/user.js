@@ -29,9 +29,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Evento para atualizar o usuário
-document.getElementById('updateUser').addEventListener('click', async () => {
-    const token = localStorage.getItem('token');
+document.getElementById('updateUser').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
+    const token = localStorage.getItem('token');
     if (!token) {
         window.location.href = '../login.html';
         return;
@@ -39,6 +40,7 @@ document.getElementById('updateUser').addEventListener('click', async () => {
 
     const newEmail = document.getElementById('newEmail').value;
     const newPassword = document.getElementById('newPassword').value;
+    const messageElement = document.getElementById('message');
 
     try {
         const response = await fetch('http://localhost:3000/user', {
@@ -51,24 +53,27 @@ document.getElementById('updateUser').addEventListener('click', async () => {
         });
 
         if (response.ok) {
-            document.getElementById('message').textContent = 'Usuário atualizado com sucesso!';
+            messageElement.textContent = 'Usuário atualizado com sucesso!';
         } else {
-            document.getElementById('message').textContent = 'Erro ao atualizar usuário.';
+            const errorMessage = await response.json();
+            messageElement.textContent = errorMessage.message || 'Erro ao atualizar usuário. Verifique os dados e tente novamente.';
         }
     } catch (error) {
         console.error('Erro:', error);
-        document.getElementById('message').textContent = 'Erro ao atualizar usuário.';
+        messageElement.textContent = 'Erro de rede. Não foi possível conectar ao servidor. Tente novamente mais tarde.';
     }
 });
+
 
 // Evento para excluir o usuário
 document.getElementById('deleteUser').addEventListener('click', async () => {
     const token = localStorage.getItem('token');
-
     if (!token) {
         window.location.href = '../login.html';
         return;
     }
+
+    const messageElement = document.getElementById('message');
 
     try {
         const response = await fetch('http://localhost:3000/user', {
@@ -82,10 +87,11 @@ document.getElementById('deleteUser').addEventListener('click', async () => {
             localStorage.removeItem('token');
             window.location.href = '../login.html';
         } else {
-            document.getElementById('message').textContent = 'Erro ao excluir usuário.';
+            const errorMessage = await response.json();
+            messageElement.textContent = errorMessage.message || 'Erro ao excluir usuário.';
         }
     } catch (error) {
         console.error('Erro:', error);
-        document.getElementById('message').textContent = 'Erro ao excluir usuário.';
+        messageElement.textContent = 'Erro de rede. Não foi possível conectar ao servidor. Tente novamente mais tarde.';
     }
 });

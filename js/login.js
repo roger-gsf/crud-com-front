@@ -3,23 +3,27 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-
-    const response = await fetch('http://localhost:3000/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-    });
-
     const messageElement = document.getElementById('message');
 
-    if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('token', data.token); // Armazena o token
-        window.location.href = '../html/user.html'; 
-    } else {
-        const errorMessage = await response.text();
-        messageElement.textContent = errorMessage; // Exibe mensagem de erro
+    try {
+        const response = await fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('token', data.token); // Armazena o token
+            window.location.href = '../html/user.html';
+        } else {
+            const errorMessage = await response.json();
+            messageElement.textContent = errorMessage.message || 'Erro ao fazer login. Verifique suas credenciais e tente novamente.';
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        messageElement.textContent = 'Erro de rede. Não foi possível conectar ao servidor. Tente novamente mais tarde.';
     }
 });
