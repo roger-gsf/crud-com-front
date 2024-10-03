@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 const app = express();
-const SECRET_KEY = 'seu_segredo_aqui'; // Troque para um segredo seguro
+const SECRET_KEY = 'my_secret_key'; // Troque para um segredo seguro
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -49,7 +49,7 @@ app.post('/login', async (req, res) => {
   db.query('SELECT * FROM users WHERE user_email = ?', [email], async (err, result) => {
     if (err) throw err;
 
-    if (result.length === 0 || !(await bcrypt.compare(password, result[0].password))) {
+    if (result.length === 0 || !(await bcrypt.compare(password, result[0].user_password))) {
       return res.status(400).send('Email ou senha inválidos');
     }
 
@@ -65,14 +65,15 @@ const authenticateToken = (req, res, next) => {
 
   jwt.verify(token, SECRET_KEY, (err, user) => {
     if (err) return res.sendStatus(403);
-    req.user = user; // Adiciona os dados do usuário ao req
+    req.user = user; // Armazena as informações do usuário
     next();
   });
 };
 
+
 // Rota para obter dados do usuário logado
 app.get('/user', authenticateToken, (req, res) => {
-  db.query('SELECT user_email FROM users WHERE user_email = ?', [req.user.user_email], (err, result) => {
+  db.query('SELECT user_email FROM users WHERE user_email = ?', [req.user.email], (err, result) => {
     if (err) throw err;
 
     if (result.length === 0) {
@@ -83,21 +84,34 @@ app.get('/user', authenticateToken, (req, res) => {
   });
 });
 
-// Rota para atualizar informações do usuário
-app.put('/user', authenticateToken, async (req, res) => {
-  const { newEmail, newPassword } = req.body;
-  const hashedPassword = await bcrypt.hash(newPassword, 10); // Criptografa a nova senha
 
-  db.query('UPDATE users SET user_email = ?, user_password = ? WHERE user_email = ?', [newEmail, hashedPassword, req.user.user_email], (err, result) => {
+// Rota para atualizar o usuário logado
+app.put('/user', authenticateToken, (req, res) => {
+  const { newEmail, newPassword } = req.body;
+
+  if (!newEmail || !newPassword) {
+    return res.status(400).send('Email e senha são obrigatórios');
+  }
+
+  bcrypt.hash(newPassword, 10, (err, hash) => {
     if (err) throw err;
 
-    if (result.affectedRows === 0) {
-      return res.status(404).send('Usuário não encontrado');
-    }
+    db.query(
+      'UPDATE users SET user_email = ?, user_password = ? WHERE user_email = ?',
+      [newEmail, hash, req.user.email],
+      (err, result) => {
+        if (err) throw err;
 
-    res.send('Usuário atualizado com sucesso');
+        if (result.affectedRows === 0) {
+          return res.status(404).send('Usuário não encontrado');
+        }
+
+        res.send('Usuário atualizado com sucesso');
+      }
+    );
   });
 });
+
 
 // Rota para deletar o usuário
 app.delete('/user', authenticateToken, (req, res) => {

@@ -17,7 +17,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.token); // Armazena o token
-        window.location.href = 'user.html'; 
+        window.location.href = '../html/user.html'; 
     } else {
         const errorMessage = await response.text();
         messageElement.textContent = errorMessage; // Exibe mensagem de erro
