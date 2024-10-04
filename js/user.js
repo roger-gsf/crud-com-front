@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (response.ok) {
             const user = await response.json();
-            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('userEmail').textContent = user.user_email;
         } else {
             console.error('Erro ao obter usuário:', response.statusText);
             window.location.href = '../login.html';
@@ -42,6 +42,10 @@ document.getElementById('updateUser').addEventListener('submit', async (e) => {
     const newPassword = document.getElementById('newPassword').value;
     const messageElement = document.getElementById('message');
 
+    const body = {};
+    if (newEmail) body.newEmail = newEmail;
+    if (newPassword) body.newPassword = newPassword;
+
     try {
         const response = await fetch('http://localhost:3000/user', {
             method: 'PUT',
@@ -49,7 +53,7 @@ document.getElementById('updateUser').addEventListener('submit', async (e) => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ newEmail, newPassword })
+            body: JSON.stringify(body)
         });
 
         if (response.ok) {
@@ -63,7 +67,6 @@ document.getElementById('updateUser').addEventListener('submit', async (e) => {
         messageElement.textContent = 'Erro de rede. Não foi possível conectar ao servidor. Tente novamente mais tarde.';
     }
 });
-
 
 // Evento para excluir o usuário
 document.getElementById('deleteUser').addEventListener('click', async () => {
