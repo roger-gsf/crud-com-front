@@ -1,28 +1,28 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página do Usuário</title>
+    <title>User page</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body>
     <div class="container">
-        <h2>Bem-vindo, <span id="userEmail"></span></h2>
+        <h2>Welcome, <span id="userEmail"></span></h2>
         <form id="updateUser">
-            <label for="newEmail">Novo Email:</label>
+            <label for="newEmail">New email:</label>
             <input type="email" id="newEmail" name="newEmail">
-            <label for="newPassword">Nova Senha:</label>
+            <label for="newPassword">New password:</label>
             <input type="password" id="newPassword" name="newPassword">
-            <button type="submit">Atualizar</button>
+            <button type="submit">Update user</button>
         </form>
-        <button id="deleteUser">Deletar Conta</button>
+        <button id="deleteUser">Delete user</button>
         <div id="message"></div>
     </div>
 
-    <script src="../js/user.js"></script>
+    <script src="../js/user-page.js"></script>
 </body>
 
 </html>

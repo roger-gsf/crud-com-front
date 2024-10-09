@@ -17,7 +17,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         if (response.ok) {
             const data = await response.json();
             localStorage.setItem('token', data.token); // Armazena o token
-            window.location.href = '../html/user.html';
+            window.location.href = '../html/user-page.html';
         } else {
             const errorMessage = await response.json();
             messageElement.textContent = errorMessage.message || 'Erro ao fazer login. Verifique suas credenciais e tente novamente.';
